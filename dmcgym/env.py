@@ -87,19 +87,21 @@ class DMCGYM(gym.core.Env):
 
         time_step = self._env.step(action)
         reward = time_step.reward or 0
-        done = time_step.last()
+        terminated = time_step.last()
         obs = time_step.observation
 
         info = {}
-        if done and time_step.discount == 1.0:
+        truncated = False
+        if terminated and time_step.discount == 1.0:
             info['TimeLimit.truncated'] = True
+            truncated = True
 
-        return dmc_obs2gym_obs(obs), reward, done, info
+        return dmc_obs2gym_obs(obs), reward, terminated, truncated, info
 
     def reset(self):
         time_step = self._env.reset()
         obs = time_step.observation
-        return dmc_obs2gym_obs(obs)
+        return dmc_obs2gym_obs(obs), {}
 
     def render(self,
                mode='rgb_array',
